@@ -1,0 +1,750 @@
+#: import utils kivy.utils
+#: import SlideTransition kivy.uix.screenmanager.SlideTransition
+ScreenManager:
+	transition: SlideTransition(duration=.2)
+	Intro:
+		id:intro 
+		name:'intro'
+		on_leave: 
+			poke_detail.ids.rv.no_of_load_set(intro.no_to_load) 
+			# print(poke_detail.ids.rv.no_of_load)
+	PokemonDetails:
+		id:poke_detail
+		name:'poke_details'
+	OpenScreen:
+		id:open_detail
+		on_enter: open_detail.thread_get_mode(poke_detail.main_id)
+		on_pre_leave: open_detail.change_remove()
+		name:'home_scr'
+<Intro>:
+	# md_bg_color:1,0,0,0.1
+	RelativeLayout:
+		padding: dp(20)
+		size_hint: (0.8,1)
+		pos_hint: {'center_x': 0.5,'center_y':0.5}
+		Image:
+			source:'image/home_img.png'
+			size_hint: (0.6, 0.6)
+			pos_hint: {'center_x': 0.5,'center_y':0.75}
+		MDLabel:
+			size:self.texture_size
+			text:root.text
+			font_name :'Life'
+			font_size: sp(10)
+			theme_text_color:'Secondary'
+			pos_hint: {'center_x': 0.5,'center_y':0.5}
+		BoxLayout:
+			pos_hint: {'center_x':0.5,'center_y': 0.8}
+			padding: dp(5)
+			spacing:dp(2)
+			MDSwitch:
+				on_active: 
+					root.allow_load(*args)
+					field.focus = True
+			Widget:
+				size_hint: (0.2,1)
+			RelativeLayout:
+				MDTextField:
+					id:field
+					opacity: 0
+					font_size: sp(18)
+					hint_text:'Enter a the length of dataset'
+					active_line:False
+					helper_text: "Between 1 to 700"
+		        	helper_text_mode: "on_focus"
+		        	font_name_hint_text :'Life'
+		        	halign:'center'
+		        	font_name_helper_text:'Life'
+		        	font_name:'Life'
+		        MDLabel:
+		        	id:allow_label
+		        	opacity: 1
+		        	size:self.texture_size
+		        	text:'Click to Search by length of dataset'
+					font_name :'Life'
+					font_size: sp(12)
+					theme_text_color:'Secondary'
+					pos_hint: {'center_x':0.5,'center_y':0.05}
+		MDLabel:
+        	size:field.size
+			size:self.texture_size
+			text:"It's recomended to load by the length of dataset as loading the full dataset may take lot of time"
+			font_name :'Life'
+			font_size: sp(10)
+			theme_text_color:'Hint'
+			pos_hint: {'center_x':0.5,'center_y': 0.25}
+		MDRectangleFlatButton:
+			text:'Click to Discover'
+			pos_hint: {'center_x':0.5,'center_y': 0.15}
+			size_hint: (1, None)
+			font_name:'Life'
+			on_press:
+				root.clicked(field.text)
+				root.manager.current = 'poke_details'
+				root.manager.transition.direction = 'left'
+		MDLabel:
+			id:add_info
+			opacity: 0
+        	size:field.size
+			size:self.texture_size
+			text:'If the condition are not met for loading then we will load the full dataset'
+			font_name :'Life'
+			font_size: sp(10)
+			theme_text_color:'Secondary'
+			pos_hint: {'center_x':0.5,'center_y': 0.07}
+<PokeViewer>
+    key_viewclass:'viewclass'  # defines the viewtype for the data items.
+    orientation: "vertical"
+    RecycleBoxLayout:
+    	id:layout
+        default_size: root.width,root.height//4
+        spacing: dp(20)
+        padding: dp(20)
+        # defines the size of the widget in reference to width and height
+        default_size_hint:1,None 
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical' # defines the orientation of data items
+<BoxPart>
+    MDCard:
+    	size_hint: (1,1)
+        pos_hint: {'center_x': 0.5,'center_y': 0.5}
+        md_bg_color:root.background_color
+        elevation:2
+        radius:20
+        on_release:
+        	# print(self.parent.parent.parent.parent.parent.manager.current)
+        	self.parent.parent.parent.parent.parent.manager.current = 'home_scr'
+        	self.parent.parent.parent.parent.parent.manager.transition.direction = 'left'
+        	self.parent.parent.parent.parent.parent.give_data(root.pokemon_id)
+        RelativeLayout:
+            size:self.size
+            padding: dp(10)
+            MDRelativeLayout:
+                spacing:dp(20)
+                padding: dp(30)
+                orientation: 'vertical'
+                pos_hint: {'center_x':0.75}
+                MDLabel:
+                    text:root.name_pokemon
+                    font_name: 'name_header'
+                    halign: 'left'
+                    size:self.texture_size
+                    font_size: sp(30)
+                    theme_text_color:'Custom'
+                    text_color:(1,1,1,1)
+                    pos_hint: {'center_y': 0.7}
+                    # font_size: sp(32)
+                MDBoxLayout:
+                    spacing: dp(8)
+                    # md_bg_color:(1,0,0,1)
+                    size_hint: (0.5,0.3)
+                    pos_hint: {'center_y': 0.3}
+                    MDCard:
+                        md_bg_color:(1,1,1,0.2)
+                        radius:15
+                        elevation:0
+                        MDLabel:
+                            text:root.type_one
+                            font_name: 'type_header'
+                            halign: 'center'
+                            theme_text_color:'Custom'
+                            text_color:(1,1,1,1)
+                    MDCard:
+                    	opacity: 0 if root.type_two == 'None' else 1
+                        md_bg_color:(1,1,1,0.2)
+                        radius:15
+                        elevation:0
+                        MDLabel:
+                            text:root.type_two
+                            font_name: 'type_header'
+                            halign: 'center'
+                            theme_text_color:'Custom'
+                            text_color:(1,1,1,1)
+            MDLabel:
+                opacity: 0.4
+                text:'#'+root.pokemon_id 
+                font_name: 'numeric'
+                halign: 'right'
+                size:self.texture_size
+                font_size:sp(40)
+                # font_size: sp(32)
+                pos_hint: {'right':1,'center_y':0.2}
+            AsyncImage:
+                size:self.size
+                source:root.pokemon_image
+                pos_hint: {'center_x':0.1,'center_y': 0.5}
+<PokemonDetails>:
+	MDBoxLayout:
+		orientation: 'vertical'
+		padding: dp(20)
+		spacing: dp(20)
+		# md_bg_color:(1,0,0,1)
+		size_hint: (1, 0.3)
+		pos_hint: {'top': 1}
+		MDLabel:
+			size_hint_y:0.4
+			text:'Pokedex'
+			font_name: 'main-header'
+			font_size: sp(30)
+			size:self.texture_size
+			halign: 'left'
+			theme_text_color:'Custom'
+			text_color:utils.get_color_from_hex('#eb5b4e')
+		MDRelativeLayout:
+			md_bg_color:utils.get_color_from_hex('#fafafa')
+			padding: dp(10)
+			spacing: dp(10)
+			size_hint: (1,0.4 )
+			MDTextFieldRound:
+				id:search_bar
+				icon_left: "magnify"
+				font_name: 'Lemon'
+				font_size: sp(14)
+	        	hint_text: 'Search for a Pokemon '
+	        	size_hint: (0.7,0.7)
+	        	pos_hint: {'center_x':0.4,'center_y':0.5  }
+				normal_color:utils.get_color_from_hex('#eaeaeb')
+				color_active:utils.get_color_from_hex('#f1f1f4')
+				line_color:utils.get_color_from_hex('#b7b9ba')
+				icon_left_color:utils.get_color_from_hex('#b7b9ba')
+				text_color:utils.get_color_from_hex('#b7b9ba')
+				
+				on_text:rv.add_data(self.text,True)
+			MDTextButton:
+				text:'cancel'
+				disabled:True 
+				opacity: 0
+				pos_hint: {'right': 0.8,'center_y':0.5}
+	        MDIconButton:
+	        	pos_hint: {'right': 1,'center_y':0.5}
+	        	icon:"menu"
+	        
+        MDLabel:
+        	size_hint_y:0.2
+        	text:'The Pokedex contains details stat for every pokemon'
+        	font_name:'text_exp'
+			size:self.texture_size
+			font_size: sp(12)
+			halign: 'left'
+			theme_text_color:'Custom'
+			text_color:utils.get_color_from_hex('#b7b9ba')
+	MDBoxLayout:
+		# md_bg_color:1,0,0,1
+		size_hint: (1, 0.7)
+		pos_hint: {'bottom': 1}
+		PokeViewer:
+			id:rv
+<AppDialog>:
+	padding: sp(30)
+	MDSpinner:
+	    size_hint: None,None 
+	    size:dp(50),dp(50)
+	    active: True 
+	    pos_hint: {'right': 1}
+	   
+	MDLabel:
+		text:root.text
+		size:self.texture_size
+		pos_hint: {'center_x': 0.5,'center_y':1}
+<EvolvePart>
+    key_viewclass:'viewclass'  # defines the viewtype for the data items.
+    orientation: "vertical"
+    RecycleBoxLayout:
+        default_size: root.width,root.height*0.6
+        spacing: dp(10)
+        padding: dp(10)
+        # defines the size of the widget in reference to width and height
+        default_size_hint:1,None 
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical' # defines the orientation of data items orientation of data items
+<MoveTab>
+    key_viewclass:'viewclass'  # defines the viewtype for the data items.
+    orientation: "vertical"
+    RecycleBoxLayout:
+        default_size: root.width,root.height*0.1
+        spacing: dp(20)
+        padding: dp(20)
+        # defines the size of the widget in reference to width and height
+        default_size_hint:1,None 
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical' # defines the orientation of data items orientation of data items
+<Evolution>
+    MDCard:
+        size:self.parent.size
+        pos_hint: {'center_x': 0.5,'center_y': 0.5}
+        elevation:10
+        # md_bg_color:1,0,0,1
+        radius:20
+        MDRelativeLayout:
+            AsyncImage:
+                source:root.poke_back
+                pos_hint: {'center_y': 0.5}
+            MDLabel:
+                text:root.name_back
+                size:self.texture_size
+                halign: 'center'
+                font_size: sp(16)
+                theme_text_color:'Custom'
+                # text_color:(1,1,0,1)
+                pos_hint: {'center_y': 0.2}
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: [dp(10), dp(30)]
+            MDLabel:
+                text:'[u]'+root.elv_type+'[/u]'
+                size:self.texture_size
+                halign: 'center'
+                markup: True
+                font_size: sp(16)
+                theme_text_color:'Secondary'
+                # text_color:(1,1,0,1)
+                pos_hint: {'center_y': 0.2}
+            MDLabel:
+                text:f'[u]{root.level}[/u]' if root.level != 'None' else ' '
+                size:self.texture_size
+                markup: True
+                halign: 'center'
+                font_size: sp(16)
+                theme_text_color:'Secondary'
+                # text_color:(1,1,0,1)
+                pos_hint: {'center_y': 0.2}
+            MDLabel:
+                text:f'[u]{root.item}[/u]' if root.item != 'None'  else ''
+                size:self.texture_size
+                halign: 'center'
+                markup: True
+                font_size: sp(16)
+                theme_text_color:'Secondary'
+                # text_color:(1,1,0,1)
+        MDRelativeLayout:
+            AsyncImage:
+                source:root.poke_front
+                pos_hint: {'center_y': 0.5}
+            MDLabel:
+                text:root.name_front
+                size:self.texture_size
+                halign: 'center'
+                font_size: sp(16)
+                theme_text_color:'Custom'
+                # text_color:(1,0,1,1)
+                pos_hint: {'center_y': 0.2}
+<OpenScreen>:
+	md_bg_color:root.background_color
+	MDIconButton:
+		opacity:0.4
+		icon:'heart-outline'
+		user_font_size:dp(32)
+		theme_text_color:'Custom'
+		text_color:(1,1,1,1)
+		pos_hint: {'center_x': 0.9,'center_y':0.95}
+		on_release:
+			print(root.all_base_data)
+	RelativeLayout:
+		MDBoxLayout:
+			# md_bg_color:0,1,1,1
+			spacing: dp(10)
+			size_hint: (0.5,0.05)
+			pos_hint: {'center_x': 0.34,'center_y':0.80}
+			MDCard:
+				md_bg_color:(1,1,1,0.2)
+				radius:15
+				elevation:0
+				MDLabel:
+					text:root.type_one
+					halign: 'center'
+					font_name: 'type_header'
+					theme_text_color:'Custom'
+					text_color:(1,1,1,1)
+			MDCard:
+				opacity: 0 if root.type_two == 'None' else 1
+				md_bg_color:(1,1,1,0.2)
+				radius:15
+				elevation:0
+				MDLabel:
+					text:root.type_two
+					halign: 'center'
+					font_name: 'type_header'
+					theme_text_color:'Custom'
+					text_color:(1,1,1,1)
+		MDLabel:
+			text:'#'+root.pokemon_id
+			font_size: dp(20)
+			size:self.texture_size
+			font_name: 'numeric'
+			theme_text_color:'Custom'
+			text_color:(1,1,1,1)
+			size_hint: (0.5,0.5)
+			pos_hint: {'center_x':1.1,'center_y':0.85}
+		MDLabel:
+			text:root.pokemon_name
+			font_size:dp(32)
+			font_name:'name_header'
+			theme_text_color:'Custom'
+			text_color:(1,1,1,1)
+			pos_hint: {'center_x':0.54,'center_y':0.88}
+			text_size:self.texture_size
+		MDIconButton:
+			opacity:0.8
+			icon:'arrow-left'
+			on_release:
+				root.manager.current = 'poke_details'
+				root.manager.transition.direction = 'right'
+			user_font_size:dp(32)
+			theme_text_color:'Custom'
+			text_color:(1,1,1,1)
+			pos_hint: {'center_x': 0.1,'center_y':0.95}
+	Image:
+		opacity: 0.2
+		source:'image/poke_ball.png'
+		size_hint: (0.5,0.5)				
+		pos_hint: {'center_x':0.75,'center_y':0.64}
+	Image:
+		opacity: 0.15
+		source:'image/dot.png'
+		size_hint: (0.2,0.2)
+		pos_hint: {'center_x':0.2,'center_y':0.7}
+	Image:
+		id:box_image
+		opacity: 0.1
+		source:'image/box.png'
+		size_hint: (0.5,0.5)
+		pos_hint: {'center_x':0.05,'center_y':0.98}
+	MDCard:
+		id:info_part
+		size_hint: (1, 0.5)
+		elevation:10
+		radius:[30,30,0,0]
+		pos_hint: {'center_y:': 0.25}
+		RelativeLayout:
+			size:self.size
+			MDTabs:
+        		tab_padding:[5,0,0,5]
+        		text_color_normal:utils.get_color_from_hex('#d6d8da')
+        		text_color_active:utils.get_color_from_hex('#363636')
+        		background_color:(1,1,1,1)
+        		indicator_color:utils.get_color_from_hex('#858ec9')
+        		pos_hint: {'center_x':0.5,'top':0.9}
+        		tab_display_mode:'text'
+        		allow_stretch: True
+        		tab_hint_x:True
+        		MDTabsBase:
+					title:'About'
+					user_font_size:sp(8)
+					RelativeLayout:
+						size:info_part.size
+						MDBoxLayout:
+							padding: 5
+							# md_bg_color:(1,0,0,1)
+							size_hint: (0.9,0.2)
+							pos_hint: {'center_x': 0.5,'center_y':0.75}
+							MDLabel:
+								id:about_text
+								font_size: sp(13) if len(self.text) <=150  else sp(12)
+								text:' '
+								font_name: 'about'
+								size:self.texture_size
+								halign:'left'
+								valign: 'center'
+						MDCard:
+							radius:dp(20)
+							elevation:10
+							padding:10
+							size_hint: (0.9,0.2)
+							pos_hint: {'center_x': 0.5,'center_y':0.55}
+							MDBoxLayout:
+								orientation: 'vertical'
+								# md_bg_color:(1,0,0,1)
+								MDLabel:
+									text:'Height'
+									font_name: 'tab_header'
+									halign: 'center'
+									font_size: sp(12)
+									size:self.texture_size
+									theme_text_color:'Secondary'
+								MDLabel:
+									id:height_value
+									text:''
+									font_size: sp(15)
+									halign: 'center'
+									size:self.texture_size
+							Widget:
+						    MDBoxLayout:
+						    	orientation: 'vertical'
+								MDLabel:
+									halign: 'center'
+									text:'Weight'
+									font_name: 'tab_header'
+									font_size: sp(12)
+									size:self.texture_size
+									theme_text_color:'Secondary'
+								MDLabel:
+									id:weight_value
+									text:''
+									halign: 'center'
+									font_size: sp(15)
+									size:self.texture_size
+						MDBoxLayout:
+							orientation: 'vertical'
+							size_hint: (0.9, 0.3)
+							padding: [dp(10),0]
+							spacing: 0
+							# md_bg_color:(1,0,0,1)
+							pos_hint: {'center_x': 0.5,'center_y':0.32}
+							MDLabel:
+								text:'Breeding'
+								font_name: 'tab_header'
+								font_size: sp(16)
+								halign: "left"
+								size:self.texture_size
+							MDGridLayout:
+								cols: 2
+								spacing:10
+								MDLabel:
+									text:'Gender'
+									font_size: sp(14)
+									theme_text_color:'Secondary'
+								MDBoxLayout:
+									MDIcon:
+										icon:'gender-male'
+										size:self.texture_size
+										user_font_size:sp(8)
+										theme_text_color:'Custom'
+										text_color:utils.get_color_from_hex('#677af4')
+									MDLabel:
+										id:gender_male
+										text:''
+										font_size:sp(12)
+										size:self.texture_size
+									Widget:
+									MDIcon:
+										icon:'gender-female'
+										size:self.texture_size
+										user_font_size:sp(8)
+										theme_text_color:'Custom'
+										text_color:utils.get_color_from_hex('#ef2971')
+									MDLabel:
+										id:gender_rate
+										text:''
+										font_size:sp(12)
+										size:self.texture_size
+								MDLabel:
+									text:'Egg Group'
+									font_size: sp(14)
+									theme_text_color:'Secondary'
+								BoxLayout:
+									MDLabel:
+										id:egg_group_one
+										text:''
+										font_size: sp(14)
+										size:self.texture_size
+									Widget:
+									MDLabel:
+										opacity: 0 if egg_group_two.text == 'None' else 1
+										id:egg_group_two
+										font_size: sp(14)
+										text:''
+										size:self.texture_size
+
+				MDTabsBase:
+					title:'Base Stats'
+					MDRelativeLayout:
+						size:info_part.size
+						MDLabel:
+							padding: [dp(25), 0]
+							text:'Base Stats.'
+							font_name: 'tab_header'
+							font_size:sp(18)
+							theme_text_color:'Custom'
+							text_color:(0,0,0,1)
+							text_size:self.texture_size
+							size_hint: (1, 0.1)	
+							pos_hint: {'center_y':0.8}	
+						MDBoxLayout:
+							padding:10
+							orientation: 'vertical'
+							size_hint: (0.9, 0.6)
+							pos_hint: {'center_x': 0.5,'center_y':0.45}
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'HP.'
+									font_size: sp(12)
+									halign: 'left'
+									size_hint_x:0.2
+									font_name: 'stat'
+									theme_text_color: 'Secondary'
+									text_color:
+								MDLabel:
+									text:str(root.all_base_data[0])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[0]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#fd9d9d')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Attack'
+									halign: 'left'
+									font_size: sp(12)
+									font_name: 'stat'
+									theme_text_color:'Secondary'
+									size_hint_x:0.2
+								MDLabel:
+									text:str(root.all_base_data[1])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[1]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#72ce97')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Defence'
+									theme_text_color:'Secondary'
+									halign: 'left'
+									font_size: sp(12)
+									font_name: 'stat'
+									size_hint_x:0.2
+								MDLabel:
+									text:str(root.all_base_data[2])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[2]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#fd9d9d')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Sp.Attk'
+									theme_text_color:'Secondary'
+									halign: 'left'
+									font_name: 'stat'
+									size_hint_x:0.2
+									font_size: sp(12)
+								MDLabel:
+									text:str(root.all_base_data[3])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[3]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#72ce97')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Sp.Def'
+									theme_text_color:'Secondary'
+									halign: 'left'
+									font_name: 'stat'
+									size_hint_x:0.2
+									font_size: sp(12)
+								MDLabel:
+									text:str(root.all_base_data[4])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[4]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#fd9d9d')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Speed.'
+									halign: 'left'
+									font_name: 'stat'
+									font_size: sp(12)
+									theme_text_color:'Secondary'
+									size_hint_x:0.2
+								MDLabel:
+									text:str(root.all_base_data[5])
+									size_hint_x:0.2
+								MDProgressBar:
+									value:root.all_base_data[5]
+									min:0
+									max:150
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#72ce97')
+							BoxLayout:
+								spacing:dp(10)
+								padding: [0, dp(10)]
+								MDLabel:
+									text:'Total'
+									theme_text_color:'Secondary'
+									font_name: 'stat'
+									halign: 'left'
+									size_hint_x:0.2
+								MDLabel:
+									id:total
+									text:str(root.all_base_data[6])
+									size_hint_x:0.2
+								MDProgressBar:
+									min:0
+									max:900
+									value:root.all_base_data[6]
+									size_hint_x:0.6
+									color:utils.get_color_from_hex('#72ce97')
+
+				MDTabsBase:
+					title:'Evolution'
+					MDBoxLayout:
+						size:self.parent.size
+						orientation: 'vertical'
+						MDLabel:
+							padding: [dp(25), 0]
+							text:'Evolution'
+							font_size:sp(18)
+							font_name: 'tab_header'
+							theme_text_color:'Custom'
+							text_color:(0,0,0,1)
+							text_size:self.texture_size
+							size_hint: (1, 0.1)						
+						EvolvePart:
+							size_hint: (1, 0.9)
+							id:evolve
+				MDTabsBase:
+					title:'Moves'
+					MDBoxLayout:
+						size:self.parent.size
+						orientation: 'vertical'
+						MDLabel:
+							padding: [dp(25), 0]
+							text:'Moves'
+							font_size:sp(18)
+							font_name: 'tab_header'
+							theme_text_color:'Custom'
+							text_color:(0,0,0,1)
+							text_size:self.texture_size
+							size_hint: (1, 0.1)						
+						MoveTab:
+							size_hint: (1, 0.9)
+							id:move_tab
+	AsyncImage:
+		source:root.pokemon_main_image
+		keep_ratio: True
+		size_hint: (0.55, 0.55)
+		pos_hint: {'center_x':0.52,'center_y':.62}
+
+<MoveTabContent>:
+	text:root.move_name
+	font_size:sp(18)
+	theme_text_color:'Custom'
+	text_color:(0,0,0,1)
+					

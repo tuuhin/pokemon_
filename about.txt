@@ -1,0 +1,1 @@
+Hellow welcome to PokeDex an App to track the database of the all the Pokemon here  you could eveything from pokemon types to the height weight bread evolution details. Enter the App and find everything about any pokemon

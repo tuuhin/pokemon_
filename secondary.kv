@@ -1,0 +1,27 @@
+ScreenManager:
+	SomeText:
+		name:'some_text'
+<SomeText>:
+	RelativeLayout:
+		padding: dp(20)
+		size_hint: (0.8,1)
+		pos_hint: {'center_x': 0.5,'center_y':0.5}
+		Image:
+			source:'image/home_img.png'
+			size_hint: (0.6, 0.6)
+			pos_hint: {'center_x': 0.5,'center_y':0.7}
+		MDLabel:
+			size:self.texture_size
+			text:root.text
+			font_name :'Life'
+			font_size: sp(10)
+			theme_text_color:'Secondary'
+			pos_hint: {'center_x': 0.5,'center_y':0.5}
+		MDLabel:
+			size:self.texture_size
+			text:"[u]Sorry Can't Load with Internet[/u]"
+			font_name :'Life'
+			markup: True
+			font_size: sp(12)
+			theme_text_color:'Secondary'
+			pos_hint: {'center_x': 0.63,'center_y':0.35}
